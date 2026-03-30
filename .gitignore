@@ -1,0 +1,23 @@
+/OLD UNUSED
+/tables
+*.docx
+
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.bcf
+*.xml
+
+# OS junk
+.DS_Store
+Thumbs.db

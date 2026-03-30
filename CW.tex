@@ -1,0 +1,245 @@
+\documentclass[11pt,oneside]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{array}          % Better control over table columns
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{graphicx} % REQUIRED for images
+\usepackage{float}    % Helps "pin" the image exactly where you want it
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage[backend=biber,style=authoryear]{biblatex}
+\addbibresource{references.bib}
+
+\usepackage[table]{xcolor} % Crucial for the blue stripes
+\usepackage{colortbl}      % Allows coloring of rows/cells
+\pgfplotsset{compat=1.18}
+
+% Page layout
+\geometry{a4paper, left=28mm, right=28mm, top=28mm, bottom=28mm}
+\setlength{\parskip}{0.6\baselineskip}
+\setlength{\parindent}{0pt}
+\onehalfspacing
+
+% Header / footer
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[L]{Fixed Income — Yield Curve Modelling}
+\fancyhead[R]{CW Project}
+\fancyfoot[C]{\thepage}
+
+% Section formatting
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+
+% Colours and plot style
+\definecolor{primary}{RGB}{31,119,180}
+\definecolor{accent}{RGB}{255,127,14}
+\definecolor{third}{RGB}{44,160,44}
+\pgfplotsset{
+    every axis/.append style={
+        grid=major, grid style={gray!20},
+        axis line style={gray!60},
+        tick style={gray!60},
+        label style={font=\small},
+        legend style={font=\small, draw=none}
+    }
+}
+
+% Document metadata
+\title{\vspace{-2em}Fixed Income Coursework (SMM149)\\\large Yield Curve Modelling}
+\author{BIF Group 1}
+\begin{document}
+\date{\today}
+\maketitle
+
+% name email table
+\begin{center}
+    % The 'tabular' environment creates the actual grid
+    % { | c | c | } means two columns, both centered (c), with vertical lines (|)
+    \begin{tabular}{ | c | c | } 
+        
+        % This spans both columns to create a "Title" row
+        % \hline creates a horizontal line
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Group Members}} \\ 
+        \hline
+        
+        % Row 1
+        Paul Delalande & Paul.Delalande@citystgeorges.ac.uk \\ 
+        \hline
+        
+        % Row 2
+        Tien Thanh Doan  & Tien-Thanh.Doan@citystgeorges.ac.uk  \\ 
+        \hline
+        
+        % Row 3
+        Ngoc Minh Khue Nguyen  & Ngoc-Minh-Khue.Nguyen@citystgeorges.ac.uk  \\ 
+        \hline
+        
+        % Row 4
+        Pietro Rota  & Pietro.Rota@citystgeorges.ac.uk  \\ 
+        \hline
+        
+    \end{tabular}
+\end{center}
+
+\begin{abstract}
+This report investigates the term structure of interest rates within the Japanese yen as of March 10, 2026, comparing sovereign risk-free benchmarks against high-quality corporate credit. Using a selection of plain vanilla Japanese Government Bonds (JGBs) and a corresponding portfolio of senior unsecured bonds issued by Toyota Motor Corporation, we estimate and analyze the spot and forward rate curves for both issuers. By employing the Nelson-Siegel-Svensson (NSS) model to fit these curves.
+\end{abstract}
+
+
+\section{Bond selection}
+For this report we decided to tackle Japanese government bonds and Toyota corporate bonds, this paring a strong setting for bond structure and forward rates comparison. On one side we have Japan, which has an unconventional sovereign bond market structure, due to its decade of macroeconomic doctrine driven by an anti-deflation policy, ultra-low interest rates, large scale asset purchases and yield curve control, all of which distorted and compressed the Japan Government Bond curve relative to other sovereign bond market. That makes Japan an analytically interesting subject for this paper, especially since now the Bank of Japan decided to exit its earlier framework by ending negative interest rates and curve control in 2024. On the other side there is Toyota, the world’s best-selling car company in the world in 2025, also a high-grade borrower with strong credit rating and global market access. This makes Toyota bonds suitable for extracting corporate curves, as the issuer is credit sensitive enough to generate a measurable spread over government bonds, but at the same time financially strong enough that the spread reflects priced credit and liquidity risk. 
+
+\section{Data collection}
+For this paper, all data was directly collected from Bloomberg, on the 10th of March 2026. All the bonds used for this report were high quality, fixed coupon vanilla bonds with maturities ranging from a couple of weeks to 40 years, all data was gathered from Bloomberg totalling 326 government bonds and 37 corporate bonds. 
+We were able to calculate the Accrued Interest by downloading also the date of the last coupon issued in the dataset and taking the convention 30/360. 
+
+
+\section{Methodology}
+To estimate the yield curves, we first collected market data for a range of maturities for both JGBs and Toyota bonds. We then applied the Nelson-Siegel-Svensson (NSS) model. This model captures the level, slope, and curvature of the yield curve through its parameters, allowing us to derive smooth spot and forward rate curves from the observed bond yields.
+
+$$
+r\left(t\right)=\beta_0+\beta_1\frac{1-e^{-\frac{t}{\tau1}}}{\frac{t}{\tau1}}+\beta_2\left(\frac{1-e^{-\frac{t}{\tau1}}}{\frac{t}{\tau1}}-e^{-\frac{t}{\tau1}}\right)
++\beta_3\left(\frac{1-e^{-\frac{t}{\tau2}}}{\frac{t}{\tau2}}-e^{-\frac{t}{\tau2}}\right)
+$$
+
+Where 
+\begin{itemize}
+    \item $\beta_0$ represents the long-term level of interest rates
+    \item $\beta_1$ captures the slope of the curve
+    \item $\beta_2$ and $\beta_3$ account for the curvature
+    \item $\tau_1$ and $\tau_2$ control the decay rates of the factors
+\end{itemize}
+
+From there this spot rate we can get the forward rate as well by reversing their relationship 
+
+$$(1+r_{t_2})^{t_2}=(1+r_{t_1})^{t_1}\times{1+f_{t_1,t_2}}^{t_2-t_1}$$
+
+
+$$f_{t_1,t_2}=\bigg[\frac{{1+r_t2}^t2}{(1+r_{t_1})^{t_1}}\bigg]^{\frac{1}{t_2-t_1}}-1$$
+
+$$f_{t_1,t_2}=\frac{(1+r_t1)^{-t1}}{(1+r_t2)^{-t2}} -1$$
+
+The best fit was achieved by minimizing the root mean square error (RMSE) of the yield, rather than the mean absolute error (MAE).
+A possible explanation for obtaining better results when minimizing RMSE rather than using the MAE in the as the objective function may lie in the different ways these loss functions penalize errors. RMSE uses squares deviations, thereby assigning larger weight to large errors, while MAE treats all deviations linearly. In the context of yield curve estimation, certain maturities, especially the longer maturities and the bonds that are not as liquid, which are more often difficult to fit. By penalizing large deviations more heavily, RMSE forces the model to closely match these critical regions, leading to a more stable and economically meaningful parameter estimation. This feature is particularly important for estimating the curvature and decay components of the NSS specification. RMSE tends to produce smoother and more globally consistent yield curves, which better capture the underlying term structure dynamics.
+
+\begin{figure}[H]
+\centering
+
+% -------- LEFT GROUP (Government) --------
+\begin{minipage}{0.48\textwidth}
+    \centering
+    
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{tables/gov_parameters_table.png}
+        \caption{Model Parameters}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{tables/gov_metrics_table.png}
+        \caption{Model Fit Metrics}
+    \end{subfigure}
+    
+\end{minipage}
+\hfill
+% -------- RIGHT GROUP (Corporate) --------
+\begin{minipage}{0.48\textwidth}
+    \centering
+    
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{tables/corp_parameters_table.png}
+        \caption{Model Parameters}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{tables/corp_metrics_table.png}
+        \caption{Model Fit Metrics}
+    \end{subfigure}
+    
+    
+\end{minipage}
+
+\caption{Model parameters and fit metrics for government and corporate NSS models}
+\label{fig:nss_results}
+
+\end{figure}
+
+
+\section{Illustrative yield-curve plots}
+
+Figure 1 shows that the spot curve is upward sloping across the whole maturity range, with the spot rate increasing from 1.55\% at 0.5 years to 1.87\% at 5 years, 2.64\% at 10 years, 3.75\% at 20 years, and 4.31\% at 30 years, before rising further to 4.58\% at the long end. This suggests that yields increase steadily with maturity rather than showing a strong hump or inversion. 
+The forward curve is steeper than the spot curve. Implied forward rates are above spot rates in the medium term and continue to rise across the maturity range. They are around 2.42\% at 5 years, 4.02\% at 10 years, 5.28\% at 20 years and 5.48\% at 30 years. This indicates that the market is pricing higher future borrowing and lending rates than current rates on the same horizon. The forward curve therefore implies that the compensation for lending in later periods increases with maturity.
+
+\section{Results}
+% --- Image Block ---
+\begin{figure}[H]             % [H] forces the image to stay EXACTLY here
+    \centering                % Centers the image on the page
+    \includegraphics[width=0.8\textwidth]{tables/gov_fit.png} 
+    % width=0.8\textwidth makes it 80% of the text width. 
+    % Adjust this decimal to resize!
+
+    \caption{Yield curve for goverment bonds}
+    \label{fig:gov_fit}      % Used for referencing (e.g., "See Figure 1")
+\end{figure}
+
+% --- Image Block ---
+\begin{figure}[H]             % [H] forces the image to stay EXACTLY here
+    \centering                % Centers the image on the page
+    \includegraphics[width=0.8\textwidth]{tables/corp_fit.png} 
+    % width=0.8\textwidth makes it 80% of the text width. 
+    % Adjust this decimal to resize!
+
+    \caption{Yield curve for goverment bonds}
+    \label{fig:corp_fit}      % Used for referencing (e.g., "See Figure 1")
+\end{figure}
+
+
+Figure 2 shows that the corporate spot curve is upward sloping across the whole maturity range, with the spot rate increasing from 2.05\% at 0.5 years to 3.56\% at 5 years, 4.71\% at 10 years, 6.16\% at 20 years, and 6.84\% at 30 years, before reaching approximately 7.08\% at the long end. This suggests a steady increase in yields with maturity, reflecting the higher credit and liquidity risk premiums associated with Toyota’s corporate debt compared to government securities. 
+The forward curve is notably steeper than the spot curve in the medium term and exhibits a distinct humped shape. Forward rates rise sharply to around 4.67\% in 5 years, 6.53\% in 10 years, and 8.08\% in 20 years, peaking near 8.28\% at the 25-year mark before gradually declining to 7.64\% in the long end. This indicates that the market is pricing significantly higher future borrowing costs in the medium term, while the slight inversion at the ultra-long end suggests a marginal decrease in the expected compensation for lending in later periods. 
+Both of these examples highlight the strength of the NSS model in filtering out the noise often found in corporate bond data due to varying credit qualities and lower liquidity, as well as bid-ask spreads, and issue-specific distortions in the government case. The model fit appears reasonable and provides a smooth, monotonic spot curve and forward rates and valuing private cash flows across the maturity spectrum.
+While bootstrapping would fit each bond exactly but might generate noisy yield curves. The model fit is reasonable rather than exact. The low fit metrics indicate that the fitted curve captures the cross-section of bond prices well. Some residual error is expected, and it actually reinforces the economic conditions rather than chasing the perfect fit.
+
+\section{Model Accuracy and Realism}
+The Nelson-Siegel-Svensson model’s performance in the analysis ended with reasonable results since it has been able to extract the underlying pattern of the term structure from the bond prices without being affected by local noise in the bond prices. This further indicates the strength of the design in the analysis context where the prices for both government and corporate instruments can be potentially influenced by not only simple discounting of cash flows but also liquidity conditions, bid-ask spreads, credit quality, and issue-specific distortions. Furthermore, another key advantage of the model is its ability to impose a smooth and coherent functional form on the data, allowing the curves to reflect the primary pricing structure rather than irregularities in individual bonds. In such context, the efficiency of the NSS model should not be judged by its capabilities to match every bond price exactly but by how efficient the derived term structure remains consistent with the principal bond prices.
+From a realism perspective, the fitted curves should be viewed as robust summary of the markets instead of a precise fit to a frictionless “correct” yield curve. This is essential because approach like bootstrapping could fit each bond perfectly, but it can produce unstable or noisy components that are not economically relevant. On the other hand, the NSS framework allows small residual errors in return for a better curve that is smooth, stable, and have better economic interpretation. Also, it should be noted that errors in any curve fit may not just a flaw but a necessary part of realism due to their role as observation of market frictions as well as fundamental pricing information. This approach to modelling should be viewed as most reasonable in terms of identifying term structure features and pricing relationships in aggregate rather than a precise tool for bond-by-bond valuation in the market. 
+
+\section{Forward credit spread}
+% --- Image Block ---
+\begin{figure}[H]             % [H] forces the image to stay EXACTLY here
+    \centering                % Centers the image on the page
+    \includegraphics[width=0.8\textwidth]{tables/forward_credit_spread.png} 
+    % width=0.8\textwidth makes it 80% of the text width. 
+    % Adjust this decimal to resize!
+
+    \caption{Yield curve for goverment bonds}
+    \label{fig:fow_cred}      % Used for referencing (e.g., "See Figure 1")
+\end{figure}
+
+Figure 2 shows that the Toyota minus JGB credit spread is slightly positive at the very short end, at just above 0.6\%, but then falls sharply into the negative after roughly the 10-year horizon and stabilizes near –0.8\% at longer maturities. The positive spread at the short end can be economically explained by the fact that Toyota is a very strong borrower, with high-grade long-term bonds. When looking at the curve literally, it could imply that Toyota forward rates are below the JGBs forward rates, but this is unlikely reflecting a true negative credit premium. A more explanatory response is that the curve reflects a combination of Japan specific sovereign market distortion and forward rate estimation sensitivity. The bank of Japan has explicitly acknowledged that its QQE (Quantitative and Qualitative Monetary Easing) and Yield curve control framework reduced JGB market liquidity and distorted relative prices, while BOJ research also finds that JGB yield-curve distortion increased materially in 2022–2023 and affected the pricing environment for Japanese corporate bonds as well. In addition, when using a model such as the NSS, forward curves are highly model-dependent; ECB studies tell us that forward curves can differ substantially across estimation methods, are constrained to flatten at the long end, and may change sharply when even a single long-maturity data point moves. Therefore, the graph tells us on the front end that Toyota trades with a sensible positive premium, but the deeply negative long end is more likely to reflect fitted-curve and benchmark distortions than a true negative credit-risk premium.
+
+\section{Conclusion}
+In conclusion this report used the NSS model to estimate the spot and forward rate curve for Japanese sovereign bonds and Toyota corporate bonds, to analyse the term structure as well as the implied forward credit spread. The findings show that both issuers display upward-sloping spot curves, suggesting a positive corporate premium at shorter maturities. However, the negative long-end forward credit spread is less robust as an indicator of credit risk and should be treated cautiously. This trend is most likely due to the influence of the estimation sensitivity and distortion in the JGB market. Overall, the analysis suggests that the use of the NSS is a good approach to summarize market pricing, but long horizon forward credit spread should be interpreted with caution.
+
+\printbibliography
+\nocite{*}
+
+
+
+\end{document}

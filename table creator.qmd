@@ -1,0 +1,150 @@
+---
+title: "Untitled"
+format: 
+    html : 
+        echo: false
+        html-table-processing: none
+        self-contained-math: true
+        embed-resources: true
+
+---
+
+```{r}
+#| include: false
+
+if_rendering <- function(yes, no) {
+  ## Same idea as isrendering but directly in an ifelse to not have certain things run all the time if you are running the document
+  ## like the dependencies here below
+  
+  doc_fmt <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  
+  # Check if rendering to known document formats
+  render_status <- c(
+    knitr::is_latex_output() || 
+    knitr::is_html_output() || 
+    is.null(doc_fmt %in% c("docx", "pdf", "pptx", "epub", "markdown", "gfm", "odt", "beamer", "typst"))
+  )
+  
+  # Return yes or no based on rendering status
+  ifelse(render_status, yes, no)
+}
+
+
+build_latex_table <- function(gt, name = "table", folder = "") {
+  dir <- if (folder=="") {
+   paste0(name, ".tex") 
+  } else {
+    paste0(folder, "/", name, ".tex")
+  }
+  
+  if_rendering("file rendering", gtsave(tbl, dir, latex_options = "hold_position"))
+}
+```
+
+# GOVERMENT
+```{r}
+#| layout-ncol: 2
+library(gt)
+library(tidyverse)
+library(webshot2)
+
+
+# Table 1: Parameters + Values
+table_params <- data.frame(
+  Parameter = c("β₀", "β₁", "β₂", "β₃", "τ₁", "τ₂"),
+Value = c(0.05641,-0.04222,-0.04227,0.00584,4.72448,0.59526),
+  stringsAsFactors = FALSE
+)
+
+# Table 2: Metrics
+table_metrics <- data.frame(
+  Metric = c("MAE (Price)", "MAE (Yield)", "RMSE (Price)", "RMSE (Yield)"),
+Value = c("0.35","635","0.46","933"),
+  stringsAsFactors = FALSE
+)
+
+gt_params <- table_params %>%
+  gt() %>%
+  cols_label(
+    Parameter = "Parameter",
+    Value = "Value"
+  ) %>%
+  tab_header(title = "Model Parameters") %>% 
+  opt_stylize(5, "blue") %>% 
+  fmt_percent(columns = "Value", decimals = 2, rows = c(1:4)) %>% 
+  fmt_number(columns = "Value", decimals = 2, rows = c(5:6))
+
+
+gt_metrics <- table_metrics %>%
+  gt() %>%
+  cols_label(
+    Metric = "Metric",
+    Value = "Value"
+  ) %>%
+  tab_header(title = "Model Fit Metrics") %>% 
+  opt_stylize(5, "blue")
+
+gt_metrics
+gt_params
+
+# save_gt_latex(gt_metrics, file = "metrics_table_govenment.tex")
+# save_gt_latex(gt_params, file = "params_table_govenment.tex")
+
+
+
+if_rendering(NA, gtsave(gt_params, "tables/gov_parameters_table.png", path = getwd(),  zoom = 5, vwidth = 800, vheight = 600))
+if_rendering(NA, gtsave(gt_metrics, "tables/gov_metrics_table.png",   path = getwd(), zoom = 5, vwidth = 800, vheight = 600))
+
+```
+
+# CORPORATE
+
+
+```{r}
+#| layout-ncol: 2
+# Table 1: Parameters + Values
+table_params <- data.frame(
+  Parameter = c("β₀", "β₁", "β₂", "β₃", "τ₁", "τ₂"),
+Value = c(0.03678,-0.02191,0.05256,0.14445,17.76451,40.34467),
+  stringsAsFactors = FALSE
+)
+
+# Table 2: Metrics
+table_metrics <- data.frame(
+  Metric = c("MAE (Price)", "MAE (Yield)", "RMSE (Price)", "RMSE (Yield)"),
+Value = c("0.03","361","0.09","252"),
+  stringsAsFactors = FALSE
+)
+
+gt_params <- table_params %>%
+  gt() %>%
+  cols_label(
+    Parameter = "Parameter",
+    Value = "Value"
+  ) %>%
+  tab_header(title = "Model Parameters") %>% 
+  opt_stylize(5, "green") %>% 
+  fmt_percent(columns = "Value", decimals = 2, rows = c(1:4)) %>% 
+  fmt_number(columns = "Value", decimals = 2, rows = c(5:6))
+
+
+gt_metrics <- table_metrics %>%
+  gt() %>%
+  cols_label(
+    Metric = "Metric",
+    Value = "Value"
+  ) %>%
+  tab_header(title = "Model Fit Metrics") %>% 
+  opt_stylize(5, "green")
+
+gt_metrics
+gt_params
+
+# save_gt_latex(gt_metrics, file = "metrics_table_corporate.tex")
+# save_gt_latex(gt_params, file = "metrics_table_corporate.tex")
+
+if_rendering(NA, gtsave(gt_params, "tables/corp_parameters_table.png", path = getwd(),  zoom = 5, vwidth = 800, vheight = 600))
+if_rendering(NA, gtsave(gt_metrics, "tables/corp_metrics_table.png",   path = getwd(), zoom = 5, vwidth = 800, vheight = 600))
+
+
+```

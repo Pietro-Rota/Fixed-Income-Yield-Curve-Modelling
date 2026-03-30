@@ -1,0 +1,58 @@
+*.html linguist-generated
+###############################################################################
+# Text handling
+###############################################################################
+
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Explicitly mark TeX-related files as text
+*.tex   text diff=tex
+*.bib   text diff=tex
+*.cls   text diff=tex
+*.sty   text diff=tex
+*.bst   text diff=tex
+*.tikz  text diff=tex
+*.pgf   text diff=tex
+
+###############################################################################
+# Use LaTeX-aware diff
+###############################################################################
+
+# Treat LaTeX as plain text but ignore common noisy commands
+[diff "tex"]
+  xfuncname = "^(\\\\(sub)*section|\\\\chapter|\\\\part|\\\\paragraph)"
+
+###############################################################################
+# Images and PDFs are binary (no diff/merge)
+###############################################################################
+
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.eps   binary
+
+###############################################################################
+# Ignore generated LaTeX build artifacts (safety layer)
+###############################################################################
+
+*.aux   binary
+*.bbl   binary
+*.blg   binary
+*.fls   binary
+*.fdb_latexmk binary
+*.log   binary
+*.out   binary
+*.toc   binary
+*.synctex.gz binary
+*.nav   binary
+*.snm   binary
+*.vrb   binary
+
+###############################################################################
+# Prevent merge conflicts in PDFs (always keep ours)
+###############################################################################
+
+*.pdf merge=ours
